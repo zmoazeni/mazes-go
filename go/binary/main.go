@@ -71,10 +71,10 @@ func (g *Grid) Each(fn func(*Cell)) {
 
 func (g *Grid) setNeighbors() {
 	g.Each(func(cell *Cell) {
-		cell.north = g.At(cell.y-1, cell.x)
-		cell.south = g.At(cell.y+1, cell.x)
-		cell.east = g.At(cell.y, cell.x+1)
-		cell.west = g.At(cell.y, cell.x-1)
+		cell.north = g.At(cell.x, cell.y-1)
+		cell.south = g.At(cell.x, cell.y+1)
+		cell.east = g.At(cell.x+1, cell.y)
+		cell.west = g.At(cell.x-1, cell.y)
 	})
 }
 
