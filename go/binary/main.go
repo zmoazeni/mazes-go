@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"strings"
+	"time"
 )
 
 type Grid struct {
@@ -17,9 +19,10 @@ type Cell struct {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	grid := NewGrid(5, 5)
 	BinaryTree(&grid)
-	fmt.Printf("%v\n", grid)
+	fmt.Print(AsciiFormatter(&grid))
 }
 
 func NewCell(x, y int) Cell {
@@ -67,6 +70,12 @@ func (g *Grid) Each(fn func(*Cell)) {
 	g.EachXY(func(c *Cell, _, _ int) {
 		fn(c)
 	})
+}
+
+func (g *Grid) EachRow(fn func([]*Cell)) {
+	for _, row := range g.cells {
+		fn(row)
+	}
 }
 
 func (g *Grid) setNeighbors() {
@@ -147,4 +156,44 @@ func BinaryTree(grid *Grid) {
 			cell.Link(neighbor)
 		}
 	})
+}
+
+func AsciiFormatter(grid *Grid) string {
+	var out strings.Builder
+	out.WriteString("+")
+	out.WriteString(strings.Repeat("---+", grid.columns))
+	out.WriteString("\n")
+
+	body := strings.Repeat(" ", 3)
+	corner := "+"
+
+	grid.EachRow(func(row []*Cell) {
+		var top, bottom strings.Builder
+		top.WriteString("|")
+		bottom.WriteString("+")
+
+		for _, cell := range row {
+			eastBoundary := "|"
+			if cell.IsLinked(cell.east) {
+				eastBoundary = " "
+			}
+			top.WriteString(body)
+			top.WriteString(eastBoundary)
+
+			southBoundary := "---"
+			if cell.IsLinked(cell.south) {
+				southBoundary = strings.Repeat(" ", 3)
+			}
+
+			bottom.WriteString(southBoundary)
+			bottom.WriteString(corner)
+		}
+
+		out.WriteString(top.String())
+		out.WriteString("\n")
+		out.WriteString(bottom.String())
+		out.WriteString("\n")
+	})
+
+	return out.String()
 }
