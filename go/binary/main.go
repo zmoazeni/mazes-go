@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+)
 
 type Grid struct {
 	rows, columns int
@@ -10,29 +13,29 @@ type Grid struct {
 type Cell struct {
 	x, y                     int
 	north, east, south, west *Cell
+	links                    map[*Cell]bool
 }
 
 func main() {
-	g := NewGrid(5, 5)
-	g.Add(&Cell{y: 1, x: 2})
-	g.Add(&Cell{y: 4, x: 4})
-	fmt.Printf("%v\n", g)
-	fmt.Printf("%v\n", g.At(0, 1))
+	grid := NewGrid(5, 5)
+	BinaryTree(&grid)
+	fmt.Printf("%v\n", grid)
+}
 
-	g.Each(func(c *Cell) {
-		fmt.Printf("cell: %v\n", c)
-	})
-
-	fmt.Printf("north of (0,1): %v\n", g.At(0, 1).north)
+func NewCell(x, y int) Cell {
+	cell := Cell{x: x, y: y}
+	cell.links = make(map[*Cell]bool)
+	return cell
 }
 
 func NewGrid(rows, columns int) Grid {
 	g := Grid{rows: rows, columns: columns}
 	cells := make([][]*Cell, rows)
 	for y := 0; y < rows; y++ {
-		cells[y] = make([]*Cell, 0)
+		cells[y] = make([]*Cell, 0, columns)
 		for x := 0; x < columns; x++ {
-			cells[y] = append(cells[y], &Cell{x: x, y: y})
+			cell := NewCell(x, y)
+			cells[y] = append(cells[y], &cell)
 		}
 	}
 	g.cells = cells
@@ -72,5 +75,76 @@ func (g *Grid) setNeighbors() {
 		cell.south = g.At(cell.y+1, cell.x)
 		cell.east = g.At(cell.y, cell.x+1)
 		cell.west = g.At(cell.y, cell.x-1)
+	})
+}
+
+func (c *Cell) Link(otherCell *Cell) {
+	c.LinkSingle(otherCell)
+	otherCell.LinkSingle(c)
+}
+
+func (c *Cell) LinkSingle(otherCell *Cell) {
+	c.links[otherCell] = true
+}
+
+func (c *Cell) Unlink(otherCell *Cell) {
+	c.UnlinkSingle(otherCell)
+	otherCell.UnlinkSingle(c)
+}
+
+func (c *Cell) UnlinkSingle(otherCell *Cell) {
+	delete(c.links, otherCell)
+}
+
+func (c *Cell) Links() []*Cell {
+	keys := make([]*Cell, 0, len(c.links))
+	for cell := range c.links {
+		keys = append(keys, cell)
+	}
+	return keys
+}
+
+func (c *Cell) IsLinked(otherCell *Cell) bool {
+	_, found := c.links[otherCell]
+	return found
+}
+
+func (c *Cell) Neighbors() []*Cell {
+	neighbors := make([]*Cell, 0)
+	if c.north != nil {
+		neighbors = append(neighbors, c.north)
+	}
+
+	if c.south != nil {
+		neighbors = append(neighbors, c.south)
+	}
+
+	if c.east != nil {
+		neighbors = append(neighbors, c.east)
+	}
+
+	if c.west != nil {
+		neighbors = append(neighbors, c.west)
+	}
+
+	return neighbors
+}
+
+func BinaryTree(grid *Grid) {
+	grid.Each(func(cell *Cell) {
+		neighbors := make([]*Cell, 0)
+		if cell.north != nil {
+			neighbors = append(neighbors, cell.north)
+		}
+
+		if cell.east != nil {
+			neighbors = append(neighbors, cell.east)
+		}
+
+		if len(neighbors) > 0 {
+			index := rand.Intn(len(neighbors))
+			neighbor := neighbors[index]
+			cell.Link(neighbor)
+		}
 	})
 }
