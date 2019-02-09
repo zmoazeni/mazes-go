@@ -6,13 +6,13 @@ type Grid struct {
 }
 
 type Cell struct {
-	x, y                     int
+	X, Y                     int
 	North, East, South, West *Cell
 	links                    map[*Cell]bool
 }
 
 func NewCell(x, y int) Cell {
-	cell := Cell{x: x, y: y}
+	cell := Cell{X: x, Y: y}
 	cell.links = make(map[*Cell]bool)
 	return cell
 }
@@ -33,7 +33,7 @@ func NewGrid(rows, columns int) Grid {
 }
 
 func (g *Grid) Add(cell *Cell) {
-	g.cells[cell.y][cell.x] = cell
+	g.cells[cell.Y][cell.X] = cell
 }
 
 func (g *Grid) At(x, y int) *Cell {
@@ -66,10 +66,10 @@ func (g *Grid) EachRow(fn func([]*Cell)) {
 
 func (g *Grid) setNeighbors() {
 	g.Each(func(cell *Cell) {
-		cell.North = g.At(cell.x, cell.y-1)
-		cell.South = g.At(cell.x, cell.y+1)
-		cell.East = g.At(cell.x+1, cell.y)
-		cell.West = g.At(cell.x-1, cell.y)
+		cell.North = g.At(cell.X, cell.Y-1)
+		cell.South = g.At(cell.X, cell.Y+1)
+		cell.East = g.At(cell.X+1, cell.Y)
+		cell.West = g.At(cell.X-1, cell.Y)
 	})
 }
 

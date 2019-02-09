@@ -27,4 +27,5 @@ func main() {
 	grid := NewGrid(rows, columns)
 	BinaryTree(&grid)
 	fmt.Print(AsciiFormatter(&grid))
+	PNG(&grid, 150) // nolint
 }
