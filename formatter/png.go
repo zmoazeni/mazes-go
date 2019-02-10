@@ -18,7 +18,7 @@ func drawBackground(gc *draw2dimg.GraphicContext, r image.Rectangle) {
 	gc.FillStroke()
 }
 
-func PNG(grid *a.Grid, cellSize int) error {
+func PNG(grid *a.Grid, cellSize int, file string) error {
 	width := cellSize * grid.Columns
 	height := cellSize * grid.Rows
 
@@ -48,5 +48,5 @@ func PNG(grid *a.Grid, cellSize int) error {
 		gc.FillStroke()
 	})
 
-	return draw2dimg.SaveToPngFile("matrix.png", dest)
+	return draw2dimg.SaveToPngFile(file, dest)
 }

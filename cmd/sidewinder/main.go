@@ -16,5 +16,5 @@ func main() {
 	grid := NewGrid(rows, columns)
 	Sidewinder(&grid)
 	fmt.Print(AsciiFormatter(&grid))
-	PNG(&grid, 150) // nolint
+	PNG(&grid, 150, "sidewinder.png") // nolint
 }
