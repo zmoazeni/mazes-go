@@ -15,6 +15,7 @@ func main() {
 	rows, columns := GetRowsAndColumns()
 	grid := NewGrid(rows, columns)
 	BinaryTree(&grid)
-	fmt.Print(AsciiFormatter(&grid))
+	distances := CalculateDistances(&grid, 0, 0)
+	fmt.Print(AsciiFormatterWithDistance(&grid, &distances))
 	PNG(&grid, 150, "binarytree.png") // nolint
 }

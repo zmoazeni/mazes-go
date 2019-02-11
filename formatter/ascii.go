@@ -1,26 +1,39 @@
 package formatter
 
 import (
+	"fmt"
 	"strings"
 
 	a "github.com/zmoazeni/mazes-go/algorithm"
 )
 
-func AsciiFormatter(grid *a.Grid) string {
+func AsciiFormatterWithDistance(grid *a.Grid, distances *a.Distances) string {
 	var out strings.Builder
 	out.WriteString("+")
 	out.WriteString(strings.Repeat("---+", grid.Columns))
 	out.WriteString("\n")
 
-	body := strings.Repeat(" ", 3)
 	corner := "+"
 
 	grid.EachRow(func(row []*a.Cell) {
 		var top, bottom strings.Builder
 		top.WriteString("|")
 		bottom.WriteString("+")
+		defaultBody := strings.Repeat(" ", 3)
 
 		for _, cell := range row {
+			var body string
+			if distances != nil {
+				d, found := distances.DistanceFromRoot(cell)
+				if found {
+					body = fmt.Sprintf("%03d", d)
+				} else {
+					body = defaultBody
+				}
+			} else {
+				body = defaultBody
+			}
+
 			eastBoundary := "|"
 			if cell.IsLinked(cell.East) {
 				eastBoundary = " "
@@ -44,4 +57,8 @@ func AsciiFormatter(grid *a.Grid) string {
 	})
 
 	return out.String()
+}
+
+func AsciiFormatter(grid *a.Grid) string {
+	return AsciiFormatterWithDistance(grid, nil)
 }
